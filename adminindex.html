@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050505">
+<title>TryTap Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--black:#050505;--panel:#111111;--panel2:#181a18;--line:rgba(255,255,255,.1);--lime:#B7FF00;--lime-soft:rgba(183,255,0,.14);--white:#fff;--muted:#a4aaa6;--danger:#ff7b7b;--radius:16px;--side:260px;
+--font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;--display:'Space Grotesk','Inter',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--black);color:var(--white);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3,p{margin:0}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--lime);color:#000;padding:10px 16px;border-radius:8px;z-index:300;font-weight:600}
+.skip:focus{left:8px}
+.logo{font-family:var(--display);font-weight:700;font-style:italic;font-size:1.6rem;letter-spacing:-.03em}
+.logo b,.logo i{color:var(--lime);font-style:italic;font-weight:700}
+.pill{font-family:var(--font);font-style:normal;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;background:var(--lime-soft);color:var(--lime);padding:3px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;font-weight:600}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 20px;border-radius:999px;border:1px solid transparent;font-weight:600;font-size:.92rem;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s,opacity .2s;text-decoration:none;color:inherit;background:none}
+.btn-lime{background:var(--lime);color:#050505}
+.btn-lime:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 26px -8px rgba(183,255,0,.6)}
+.btn-ghost{border-color:rgba(255,255,255,.3)}
+.btn-ghost:hover:not(:disabled){border-color:var(--lime);color:var(--lime)}
+.btn-danger{border-color:rgba(255,123,123,.55);color:var(--danger)}
+.btn-danger:hover:not(:disabled){background:rgba(255,123,123,.12)}
+.btn-danger.solid{background:#ff5d5d;color:#190000;border-color:#ff5d5d}
+.btn-sm{min-height:36px;padding:6px 14px;font-size:.82rem}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.loading{position:relative;pointer-events:none}
+.btn.loading::after{content:"";width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Forms */
+.field{display:grid;gap:6px;margin-bottom:16px}
+.field>label,.lbl{font-size:.82rem;font-weight:600;color:#dfe3e0}
+.req{color:var(--lime)}
+.hint{font-size:.78rem;color:var(--muted)}
+input[type=text],input[type=email],input[type=password],input[type=search],input[type=tel],select,textarea{width:100%;background:#0b0c0b;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 14px;min-height:46px;transition:border-color .2s,box-shadow .2s}
+textarea{resize:vertical;min-height:100px}
+select option{background:#111}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--lime);box-shadow:0 0 0 3px rgba(183,255,0,.2)}
+[aria-invalid="true"]{border-color:var(--danger)!important}
+.err{font-size:.8rem;color:var(--danger);min-height:0}
+.err:empty{display:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.check{display:flex;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#0b0c0b;min-height:46px;cursor:pointer}
+.check input{width:20px;height:20px;accent-color:var(--lime);flex:none}
+.banner{padding:12px 14px;border-radius:12px;font-size:.88rem;margin-bottom:16px;border:1px solid}
+.banner.ok{background:var(--lime-soft);border-color:rgba(183,255,0,.45);color:#e9ffb0}
+.banner.bad{background:rgba(255,107,107,.1);border-color:rgba(255,107,107,.5);color:#ffb9b9}
+.banner:empty{display:none}
+
+/* Login */
+.center{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(60% 50% at 70% 20%,rgba(183,255,0,.12),transparent 70%),var(--black)}
+.card{background:linear-gradient(180deg,#131513,#0c0d0c);border:1px solid var(--line);border-radius:22px;padding:28px}
+.login{width:min(420px,100%);border-color:rgba(183,255,0,.3);box-shadow:0 30px 80px -40px rgba(183,255,0,.35)}
+.login h1{font-family:var(--display);font-size:1.6rem;margin:18px 0 4px}
+.login>p{color:var(--muted);font-size:.9rem;margin-bottom:22px}
+
+/* Shell */
+.app{display:grid;grid-template-columns:var(--side) 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:22px;overflow:auto}
+.side nav{display:grid;gap:6px}
+.nav-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;min-height:46px;padding:10px 14px;border-radius:12px;border:1px solid transparent;background:none;color:#d8dcd9;font-weight:500;transition:background .2s,color .2s}
+.nav-btn svg{width:20px;height:20px;flex:none}
+.nav-btn:hover{background:rgba(255,255,255,.05)}
+.nav-btn[aria-current="page"]{background:var(--lime-soft);color:var(--lime);border-color:rgba(183,255,0,.35)}
+.side-foot{margin-top:auto;display:grid;gap:10px;font-size:.8rem;color:var(--muted)}
+.side-foot .who{overflow-wrap:anywhere}
+.topbar{display:none;position:sticky;top:0;z-index:40;background:rgba(5,5,5,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px 16px;align-items:center;gap:14px}
+.burger{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:none;display:grid;place-items:center}
+.burger svg{width:22px;height:22px}
+.scrim{display:none}
+.main{padding:clamp(18px,3vw,38px);min-width:0;max-width:1180px;width:100%}
+.view-h{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;margin-bottom:24px}
+.view-h h1{font-family:var(--display);font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.02em;outline:none}
+.view-h p{color:var(--muted);font-size:.9rem;margin-top:2px}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+
+/* Dashboard */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.stat{padding:20px;border-radius:var(--radius);border:1px solid var(--line);background:var(--panel)}
+.stat span{display:block;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.stat strong{display:block;font-family:var(--display);font-size:2.3rem;line-height:1.1;margin-top:6px}
+.stat.hl strong{color:var(--lime)}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.toolbar .sw{flex:1 1 260px}
+.toolbar select{width:auto;min-width:150px}
+.list{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden}
+.prow{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,1.4fr) minmax(0,1fr) 320px;gap:14px;align-items:center;padding:14px 18px;border-top:1px solid var(--line)}
+.prow .c-name{grid-area:n}.prow .c-cat{grid-area:c}.prow .c-price{grid-area:p}.prow .c-status{grid-area:s}.prow .pact{grid-area:a}
+.prow{grid-template-areas:"n c p s a"}
+.price-cell{white-space:nowrap}
+.pact .btn-sm{padding:6px 11px}
+.prow:first-child{border-top:0}
+.prow.head{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:#0d0e0d;padding-block:10px}
+.pname{display:flex;gap:12px;align-items:center;min-width:0}
+.thumb{width:48px;height:48px;border-radius:10px;border:1px solid var(--line);background:#0b0c0b;object-fit:cover;flex:none;display:grid;place-items:center;color:var(--lime);font-family:var(--display);font-style:italic;font-weight:700}
+.pname b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pname small{color:var(--muted);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{display:inline-block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line)}
+.tag.pub{background:var(--lime-soft);color:var(--lime);border-color:rgba(183,255,0,.4)}
+.tag.draft{color:var(--muted)}
+.tag.star{background:var(--lime);color:#000;border-color:var(--lime);margin-left:6px}
+.pact{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.price-cell s{color:var(--muted);font-size:.8em;margin-right:4px}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.empty .btn{margin-top:14px}
+.skeleton{height:64px;margin:12px 18px;border-radius:12px;background:linear-gradient(90deg,#151715,#1d201d,#151715);background-size:200% 100%;animation:sh 1.3s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* Editor */
+.panel{padding:clamp(18px,3vw,28px);border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);margin-bottom:18px}
+.panel h2{font-family:var(--display);font-size:1.15rem;margin-bottom:16px}
+.imgbox{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.imgprev{width:140px;height:140px;border-radius:14px;border:1px dashed rgba(255,255,255,.25);background:#0b0c0b;display:grid;place-items:center;color:var(--muted);font-size:.78rem;text-align:center;overflow:hidden}
+.imgprev img{width:100%;height:100%;object-fit:contain}
+.sticky-save{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--black) 30%);padding:22px 0 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;z-index:5}
+.sticky-save .when{color:var(--muted);font-size:.82rem}
+.faqrow{display:grid;grid-template-columns:1fr auto;gap:14px;padding:16px 18px;border-top:1px solid var(--line);align-items:start}
+.faqrow:first-child{border-top:0}
+.faqrow b{display:block}
+.faqrow p{color:var(--muted);font-size:.88rem;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* Dialog + toasts */
+dialog{background:#111;color:#fff;border:1px solid rgba(183,255,0,.35);border-radius:20px;padding:26px;width:min(520px,calc(100% - 32px));box-shadow:0 40px 100px -30px #000}
+dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
+dialog h2{font-family:var(--display);font-size:1.3rem;margin-bottom:8px}
+dialog p.m{color:var(--muted);margin-bottom:20px}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:8px}
+#toasts{position:fixed;right:16px;bottom:16px;display:grid;gap:10px;z-index:400;width:min(380px,calc(100% - 32px))}
+.toast{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;background:#151715;border:1px solid rgba(183,255,0,.5);box-shadow:0 18px 50px -20px #000;font-size:.9rem;animation:in .25s ease}
+.toast.bad{border-color:rgba(255,123,123,.6)}
+.toast span{flex:1}
+.toast button{background:none;border:0;color:var(--muted);font-size:1.1rem;line-height:1;min-width:28px;min-height:28px}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+
+@media (max-width:1420px){
+  .prow,.prow.head{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);grid-template-areas:"n c p s" "a a a a"}
+  .prow.head{grid-template-areas:"n c p s"}
+  .prow.head>:last-child{display:none}
+  .pact{justify-content:flex-start}
+}
+@media (max-width:980px){
+  .app{grid-template-columns:1fr}
+  .topbar{display:flex}
+  .side{position:fixed;inset:0 auto 0 0;width:min(300px,86vw);z-index:120;transform:translateX(-102%);transition:transform .28s;box-shadow:20px 0 60px -20px #000}
+  .side.open{transform:none}
+  .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:110}
+}
+@media (max-width:760px){
+  .stats{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+  .prow.head{display:none}
+  .prow,.prow.head{grid-template-columns:1fr auto;grid-template-areas:"n n" "p s" "a a"}
+  .prow .c-cat{display:none}.prow .c-status{text-align:right}
+  .btn-sm{min-height:44px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<!-- Icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-dash" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="4" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v4h4M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 16.8v.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<div id="boot" class="center"><p role="status">Loading…</p></div>
+
+<div id="no-config" class="center" hidden>
+  <div class="card login">
+    <div class="logo"><b>T</b>ry<i>Tap</i><span class="pill">Admin</span></div>
+    <h1>Backend not configured</h1>
+    <p>Open <code>config.js</code> in the site root and set your Supabase project URL and anon key (see <code>SETUP.md</code>). Until then, nothing can be saved and no one can sign in.</p>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="center" hidden>
+  <div class="card login">
+    <div class="logo"><b>T</b>ry<i>Tap</i><span class="pill">Admin</span></div>
+    <h1>Sign in</h1>
+    <p>Authorised administrators only.</p>
+    <form id="login-form" novalidate>
+      <div id="login-err" class="banner bad" role="alert"></div>
+      <div class="field"><label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="l-pass">Password</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn-lime" id="login-btn" type="submit" style="width:100%" data-loading="Signing in…">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="app" hidden>
+  <aside class="side" id="side" aria-label="Admin sidebar">
+    <div class="logo"><b>T</b>ry<i>Tap</i><span class="pill">Admin</span></div>
+    <nav aria-label="Admin sections">
+      <button class="nav-btn" data-nav="dashboard"><svg><use href="#i-dash"/></svg>Dashboard</button>
+      <button class="nav-btn" data-nav="content"><svg><use href="#i-doc"/></svg>Website content</button>
+      <button class="nav-btn" data-nav="faqs"><svg><use href="#i-q"/></svg>FAQs</button>
+      <button class="nav-btn" data-nav="settings"><svg><use href="#i-cog"/></svg>Settings</button>
+    </nav>
+    <div class="side-foot">
+      <span class="who" id="who"></span>
+      <a class="btn btn-ghost btn-sm" href="../" target="_blank" rel="noopener">View website ↗</a>
+      <button class="btn btn-ghost btn-sm" id="signout" data-loading="Signing out…">Sign out</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div>
+    <div class="topbar">
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="side"><svg><use href="#i-menu"/></svg></button>
+      <div class="logo"><b>T</b>ry<i>Tap</i></div>
+    </div>
+    <main class="main" id="main">
+      <div id="load-err" class="banner bad" role="alert"></div>
+
+      <!-- Dashboard -->
+      <section id="v-dashboard" hidden aria-labelledby="h-dash">
+        <div class="view-h"><div><h1 id="h-dash" tabindex="-1">Dashboard</h1><p>Manage the products shown on your website.</p></div>
+          <div class="actions"><button class="btn btn-lime" id="add-product">+ Add product</button></div></div>
+        <div class="stats" id="stats" aria-label="Summary">
+          <div class="stat"><span>Total products</span><strong id="s-total">–</strong></div>
+          <div class="stat hl"><span>Published</span><strong id="s-pub">–</strong></div>
+          <div class="stat"><span>Drafts</span><strong id="s-draft">–</strong></div>
+        </div>
+        <div class="toolbar">
+          <div class="sw"><input id="search" type="search" aria-label="Search products" placeholder="Search by name, slug or category…" autocomplete="off"></div>
+          <div>
+            <select id="filter" aria-label="Filter by status"><option value="all">All statuses</option><option value="published">Published</option><option value="draft">Drafts</option></select></div>
+        </div>
+        <div class="list" id="plist" aria-live="polite"></div>
+      </section>
+
+      <!-- Product editor -->
+      <section id="v-product" hidden aria-labelledby="h-prod">
+        <div class="view-h"><div><h1 id="h-prod" tabindex="-1">Product</h1><p><a href="#dashboard" style="color:var(--lime)">← Back to products</a></p></div>
+          <div class="actions" id="prod-actions"></div></div>
+        <form id="pform" novalidate>
+          <div id="p-banner" class="banner" role="status"></div>
+          <div class="panel">
+            <h2>Details</h2>
+            <div class="field"><label for="pf-name">Product name <span class="req">*</span></label><input id="pf-name" type="text" maxlength="80" aria-describedby="pf-name-e" required><p class="err" id="pf-name-e"></p></div>
+            <div class="field"><label for="pf-slug">Slug <span class="req">*</span></label><input id="pf-slug" type="text" maxlength="80" aria-describedby="pf-slug-h pf-slug-e" autocapitalize="off" spellcheck="false" required><p class="hint" id="pf-slug-h">Lowercase letters, numbers and hyphens. Must be unique.</p><p class="err" id="pf-slug-e"></p></div>
+            <div class="field"><label for="pf-desc">Description</label><textarea id="pf-desc" maxlength="600" aria-describedby="pf-desc-h pf-desc-e"></textarea><p class="hint" id="pf-desc-h"><span id="pf-desc-n">0</span>/600</p><p class="err" id="pf-desc-e"></p></div>
+            <div class="grid2">
+              <div class="field"><label for="pf-cat">Category</label><input id="pf-cat" type="text" maxlength="40" list="cat-list" aria-describedby="pf-cat-e"><datalist id="cat-list"></datalist><p class="err" id="pf-cat-e"></p></div>
+              <div class="field"><label for="pf-avail">Availability</label><select id="pf-avail"><option value="in_stock">In stock</option><option value="out_of_stock">Out of stock</option><option value="preorder">Pre-order</option><option value="coming_soon">Coming soon</option></select></div>
+            </div>
+            <div class="field"><label for="pf-feat">Features</label><textarea id="pf-feat" aria-describedby="pf-feat-h pf-feat-e" placeholder="One feature per line"></textarea><p class="hint" id="pf-feat-h">One per line. Up to 8 features, 80 characters each.</p><p class="err" id="pf-feat-e"></p></div>
+          </div>
+
+          <div class="panel">
+            <h2>Pricing</h2>
+            <div class="grid2">
+              <div class="field"><label for="pf-price">Price <span class="req">*</span></label><input id="pf-price" type="text" inputmode="decimal" aria-describedby="pf-price-h pf-price-e" required><p class="hint" id="pf-price-h"></p><p class="err" id="pf-price-e"></p></div>
+              <div class="field"><label for="pf-cmp">Compare-at price</label><input id="pf-cmp" type="text" inputmode="decimal" aria-describedby="pf-cmp-h pf-cmp-e"><p class="hint" id="pf-cmp-h">Optional. Must be higher than the price; shown crossed out.</p><p class="err" id="pf-cmp-e"></p></div>
+            </div>
+            <div class="field" style="max-width:260px"><label for="pf-cur">Currency</label><select id="pf-cur"></select></div>
+          </div>
+
+          <div class="panel">
+            <h2>Image</h2>
+            <div class="imgbox">
+              <div class="imgprev" id="img-prev"><span>No image<br>(default card art is used)</span></div>
+              <div>
+                <input id="pf-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif" hidden>
+                <div class="actions"><button type="button" class="btn btn-ghost btn-sm" id="img-pick">Upload image</button><button type="button" class="btn btn-ghost btn-sm" id="img-rm" hidden>Remove</button></div>
+                <p class="hint" style="margin-top:8px">JPG, PNG, WebP or AVIF, up to 2 MB.</p><p class="err" id="img-e" role="alert"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Visibility</h2>
+            <div class="grid2">
+              <label class="check"><input type="checkbox" id="pf-pub"><span><b>Published</b><br><span class="hint">Visible on the public website. Unticked = draft.</span></span></label>
+              <label class="check"><input type="checkbox" id="pf-feat-b"><span><b>Featured / Popular badge</b><br><span class="hint">Highlights the card with a “Popular” badge.</span></span></label>
+            </div>
+          </div>
+
+          <div class="sticky-save">
+            <button class="btn btn-lime" type="submit" id="p-save" data-loading="Saving…">Save product</button>
+            <a class="btn btn-ghost" href="#dashboard">Cancel</a>
+            <span class="when" id="p-when" role="status"></span>
+          </div>
+        </form>
+      </section>
+
+      <!-- Website content -->
+      <section id="v-content" hidden aria-labelledby="h-content">
+        <div class="view-h"><div><h1 id="h-content" tabindex="-1">Website content</h1><p>Text shown on your public website.</p></div></div>
+        <form id="cform" novalidate>
+          <div id="c-banner" class="banner" role="status"></div>
+          <div class="panel"><h2>Hero</h2>
+            <div class="grid2">
+              <div class="field"><label for="c-hero_heading">Heading (white part) <span class="req">*</span></label><input id="c-hero_heading" type="text" maxlength="80" aria-describedby="c-hero_heading-e"><p class="err" id="c-hero_heading-e"></p></div>
+              <div class="field"><label for="c-hero_heading_accent">Heading (lime part) <span class="req">*</span></label><input id="c-hero_heading_accent" type="text" maxlength="80" aria-describedby="c-hero_heading_accent-e"><p class="err" id="c-hero_heading_accent-e"></p></div>
+            </div>
+            <div class="field"><label for="c-hero_subtext">Hero description</label><textarea id="c-hero_subtext" maxlength="300" aria-describedby="c-hero_subtext-e"></textarea><p class="err" id="c-hero_subtext-e"></p></div>
+            <div class="field"><label for="c-tagline">Tagline</label><input id="c-tagline" type="text" maxlength="80" aria-describedby="c-tagline-e"><p class="err" id="c-tagline-e"></p></div>
+          </div>
+          <div class="panel"><h2>Buttons</h2>
+            <div class="grid2">
+              <div class="field"><label for="c-hero_cta_primary">Main button label <span class="req">*</span></label><input id="c-hero_cta_primary" type="text" maxlength="40" aria-describedby="c-hero_cta_primary-e"><p class="err" id="c-hero_cta_primary-e"></p></div>
+              <div class="field"><label for="c-hero_cta_secondary">Secondary button label <span class="req">*</span></label><input id="c-hero_cta_secondary" type="text" maxlength="40" aria-describedby="c-hero_cta_secondary-e"><p class="err" id="c-hero_cta_secondary-e"></p></div>
+            </div>
+            <div class="field" style="max-width:360px"><label for="c-nav_cta">Navigation button label <span class="req">*</span></label><input id="c-nav_cta" type="text" maxlength="30" aria-describedby="c-nav_cta-e"><p class="err" id="c-nav_cta-e"></p></div>
+          </div>
+          <div class="panel"><h2>Other descriptions</h2>
+            <div class="field"><label for="c-products_lead">Products section intro</label><textarea id="c-products_lead" maxlength="300" aria-describedby="c-products_lead-e"></textarea><p class="err" id="c-products_lead-e"></p></div>
+            <div class="field"><label for="c-about_text">Footer “about” text</label><textarea id="c-about_text" maxlength="300" aria-describedby="c-about_text-e"></textarea><p class="err" id="c-about_text-e"></p></div>
+          </div>
+          <div class="panel"><h2>Business contact details</h2>
+            <div class="grid2">
+              <div class="field"><label for="c-contact_email">Email</label><input id="c-contact_email" type="email" maxlength="120" aria-describedby="c-contact_email-e"><p class="err" id="c-contact_email-e"></p></div>
+              <div class="field"><label for="c-contact_phone">Phone</label><input id="c-contact_phone" type="tel" maxlength="40" aria-describedby="c-contact_phone-e"><p class="err" id="c-contact_phone-e"></p></div>
+            </div>
+            <div class="field"><label for="c-contact_address">Address</label><input id="c-contact_address" type="text" maxlength="200" aria-describedby="c-contact_address-e"><p class="err" id="c-contact_address-e"></p></div>
+          </div>
+          <div class="sticky-save"><button class="btn btn-lime" type="submit" id="c-save" data-loading="Saving…">Save content</button><span class="when" id="c-when" role="status"></span></div>
+        </form>
+      </section>
+
+      <!-- FAQs -->
+      <section id="v-faqs" hidden aria-labelledby="h-faqs">
+        <div class="view-h"><div><h1 id="h-faqs" tabindex="-1">FAQs</h1><p>Questions shown in the website FAQ, in this order.</p></div>
+          <div class="actions"><button class="btn btn-lime" id="add-faq">+ Add FAQ</button></div></div>
+        <div class="list" id="faq-list" aria-live="polite"></div>
+      </section>
+
+      <!-- Settings -->
+      <section id="v-settings" hidden aria-labelledby="h-settings">
+        <div class="view-h"><div><h1 id="h-settings" tabindex="-1">Settings</h1><p>Currency and number formatting.</p></div></div>
+        <form id="sform" novalidate>
+          <div id="s-banner" class="banner" role="status"></div>
+          <div class="panel"><h2>Currency &amp; display</h2>
+            <div class="grid2">
+              <div class="field"><label for="s-cur">Default currency for new products</label><select id="s-cur"></select></div>
+              <div class="field"><label for="s-loc">Number format (locale)</label><select id="s-loc"></select></div>
+            </div>
+            <p class="hint">Preview: <strong id="s-prev" style="color:var(--lime)"></strong></p>
+            <p class="hint" style="margin-top:10px">Prices are stored as whole minor units (paise/cents) together with their own currency code, so changing this setting never rewrites or converts existing product prices. Each product keeps the currency it was saved with.</p>
+          </div>
+          <div class="sticky-save"><button class="btn btn-lime" type="submit" id="s-save" data-loading="Saving…">Save settings</button><span class="when" id="s-when" role="status"></span></div>
+        </form>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Dialogs -->
+<dialog id="confirm" aria-labelledby="cf-t" aria-describedby="cf-m">
+  <h2 id="cf-t"></h2><p class="m" id="cf-m"></p>
+  <div class="dlg-actions"><button class="btn btn-ghost" id="cf-no" type="button">Cancel</button><button class="btn btn-danger solid" id="cf-yes" type="button"></button></div>
+</dialog>
+<dialog id="faq-dlg" aria-labelledby="fd-t">
+  <h2 id="fd-t">FAQ</h2>
+  <form id="fform" novalidate>
+    <div id="f-banner" class="banner bad" role="alert"></div>
+    <div class="field"><label for="f-q">Question <span class="req">*</span></label><input id="f-q" type="text" maxlength="200" aria-describedby="f-q-e"><p class="err" id="f-q-e"></p></div>
+    <div class="field"><label for="f-a">Answer <span class="req">*</span></label><textarea id="f-a" maxlength="1500" aria-describedby="f-a-e"></textarea><p class="err" id="f-a-e"></p></div>
+    <label class="check" style="margin-bottom:16px"><input type="checkbox" id="f-pub"><span>Published (visible on the website)</span></label>
+    <div class="dlg-actions"><button class="btn btn-ghost" type="button" id="f-cancel">Cancel</button><button class="btn btn-lime" type="submit" id="f-save" data-loading="Saving…">Save FAQ</button></div>
+  </form>
+</dialog>
+<div id="toasts" role="region" aria-label="Notifications" aria-live="polite"></div>
+
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+'use strict';
+/* ---------- helpers ---------- */
+var $ = function(s, r){ return (r || document).querySelector(s); };
+function h(tag, props){
+  var e = document.createElement(tag), kids = [].slice.call(arguments, 2);
+  Object.keys(props || {}).forEach(function(k){
+    var v = props[k]; if(v == null || v === false) return;
+    if(k === 'class') e.className = v; else if(k.indexOf('on') === 0) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v);
+  });
+  (function add(list){ list.forEach(function(c){ if(Array.isArray(c)) return add(c); if(c == null || c === false) return; e.append(c.nodeType ? c : document.createTextNode(String(c))); }); })(kids);
+  return e;
+}
+var CURRENCIES = ['INR','USD','EUR','GBP','AED','SGD','AUD','CAD'];
+var LOCALES = [['en-IN','English (India)'],['en-US','English (US)'],['en-GB','English (UK)'],['en-AE','English (UAE)'],['en-SG','English (Singapore)'],['en-AU','English (Australia)'],['en-CA','English (Canada)'],['de-DE','Deutsch (Deutschland)'],['fr-FR','Français (France)']];
+var AVAIL = {in_stock:'In stock', out_of_stock:'Out of stock', preorder:'Pre-order', coming_soon:'Coming soon'};
+
+function digitsFor(cur){ try{ return new Intl.NumberFormat('en', {style:'currency', currency:cur}).resolvedOptions().maximumFractionDigits; }catch(e){ return 2; } }
+function fmt(minor, cur, loc){
+  try{
+    var d = digitsFor(cur), whole = minor % Math.pow(10, d) === 0;
+    return new Intl.NumberFormat(loc, {style:'currency', currency:cur, minimumFractionDigits: whole ? 0 : d, maximumFractionDigits: whole ? 0 : d}).format(minor / Math.pow(10, d));
+  }catch(e){ return cur + ' ' + minor; }
+}
+/* "1,999.50" -> 199950 (integer minor units; no float maths). Returns null if invalid. */
+function toMinor(str, cur){
+  var d = digitsFor(cur), t = String(str).trim().replace(/,/g, '');
+  var re = d === 0 ? /^\d{1,9}$/ : new RegExp('^\\d{1,9}(\\.\\d{1,' + d + '})?$');
+  if(!re.test(t)) return null;
+  var parts = t.split('.'), frac = (parts[1] || '');
+  while(frac.length < d) frac += '0';
+  return parseInt(parts[0] + frac, 10);
+}
+function fromMinor(minor, cur){
+  var d = digitsFor(cur), s = String(minor);
+  if(d === 0) return s;
+  while(s.length <= d) s = '0' + s;
+  var i = s.slice(0, s.length - d), f = s.slice(s.length - d);
+  return /^0+$/.test(f) ? i : i + '.' + f;
+}
+function slugify(t){ return t.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80); }
+function friendly(err){
+  if(!err) return 'Something went wrong.';
+  var m = String(err.message || err);
+  if(err.code === '23505') return 'That slug is already used by another product. Choose a different one.';
+  if(err.code === '42501' || /row-level security|permission denied/i.test(m)) return 'Permission denied: your account is not allowed to make this change.';
+  if(/JWT|expired/i.test(m)) return 'Your session expired. Please sign in again.';
+  if(/failed to fetch|network/i.test(m)) return 'Network problem: could not reach the server. Check your connection and try again.';
+  if(err.code === '23514') return 'The server rejected a value that is out of range. Check the highlighted limits.';
+  return m;
+}
+function toast(msg, bad){
+  var t = h('div', {class:'toast' + (bad ? ' bad' : ''), role: bad ? 'alert' : 'status'}, h('span', null, msg),
+    h('button', {type:'button', 'aria-label':'Dismiss', onclick:function(){ t.remove(); }}, '×'));
+  $('#toasts').append(t); setTimeout(function(){ t.remove(); }, bad ? 9000 : 4000);
+}
+function busy(btn, fn){
+  if(btn.disabled) return Promise.resolve();
+  var label = btn.textContent; btn.disabled = true; btn.classList.add('loading'); btn.setAttribute('aria-busy','true');
+  if(btn.dataset.loading) btn.textContent = btn.dataset.loading;
+  return Promise.resolve().then(fn).finally(function(){ btn.disabled = false; btn.classList.remove('loading'); btn.removeAttribute('aria-busy'); btn.textContent = label; });
+}
+function banner(id, msg, bad){ var b = $(id); b.textContent = msg || ''; b.className = 'banner ' + (bad ? 'bad' : 'ok'); if(!msg) b.className = 'banner'; }
+function setErr(id, msg){ var e = $('#' + id + '-e'), i = $('#' + id); if(e) e.textContent = msg || ''; if(i){ if(msg) i.setAttribute('aria-invalid','true'); else i.removeAttribute('aria-invalid'); } }
+function clearErrs(form){ [].forEach.call(form.querySelectorAll('.err'), function(e){ e.textContent = ''; }); [].forEach.call(form.querySelectorAll('[aria-invalid]'), function(i){ i.removeAttribute('aria-invalid'); }); }
+function confirmBox(title, msg, yes){
+  return new Promise(function(res){
+    var d = $('#confirm'); $('#cf-t').textContent = title; $('#cf-m').textContent = msg; $('#cf-yes').textContent = yes;
+    var out = false;
+    function fin(v){ out = v; d.close(); }
+    $('#cf-yes').onclick = function(){ fin(true); }; $('#cf-no').onclick = function(){ fin(false); };
+    d.onclose = function(){ res(out); };
+    d.showModal(); $('#cf-no').focus();
+  });
+}
+function nowStr(){ return 'Saved at ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+
+/* ---------- boot / auth ---------- */
+var cfg = window.TRYTAP_CONFIG, sb = null;
+var state = {user:null, products:[], faqs:[], content:null, editing:null, faqEditing:null};
+function screen(name){ ['boot','no-config','login','app'].forEach(function(id){ $('#' + id).hidden = id !== name; }); }
+
+if(!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || cfg.SUPABASE_URL.indexOf('YOUR-PROJECT') > -1 || !window.supabase){
+  screen('no-config');
+  if(cfg && !window.supabase) $('#no-config p').textContent = 'The Supabase library could not be loaded (network or content blocker). Reload the page.';
+} else {
+  sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {auth:{persistSession:true, autoRefreshToken:true}});
+  sb.auth.getSession().then(function(r){ if(r.data && r.data.session) enter(r.data.session.user); else screen('login'); }).catch(function(){ screen('login'); });
+  sb.auth.onAuthStateChange(function(ev){ if(ev === 'SIGNED_OUT' && !$('#app').hidden){ state.user = null; screen('login'); } });
+}
+
+$('#login-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var email = $('#l-email').value.trim(), pass = $('#l-pass').value, err = $('#login-err');
+  err.textContent = '';
+  if(!email || !pass){ err.textContent = 'Enter your email and password.'; return; }
+  busy($('#login-btn'), function(){
+    return sb.auth.signInWithPassword({email:email, password:pass}).then(function(r){
+      if(r.error){ err.textContent = /network|fetch/i.test(r.error.message) ? friendly(r.error) : 'Invalid email or password.'; return; }
+      $('#l-pass').value = ''; return enter(r.data.user);
+    });
+  });
+});
+$('#signout').addEventListener('click', function(){ busy($('#signout'), function(){ return sb.auth.signOut().then(function(){ state.user = null; location.hash = ''; screen('login'); }); }); });
+
+function enter(user){
+  screen('boot');
+  /* UX check only. The real enforcement is Row Level Security on the server. */
+  return sb.from('admin_users').select('user_id').eq('user_id', user.id).maybeSingle().then(function(r){
+    if(r.error || !r.data){
+      return sb.auth.signOut().then(function(){ screen('login'); $('#login-err').textContent = r.error ? friendly(r.error) : 'This account is not authorised as an administrator.'; });
+    }
+    state.user = user; $('#who').textContent = 'Signed in as ' + user.email;
+    screen('app'); return loadAll();
+  });
+}
+
+function loadAll(){
+  banner('#load-err', '');
+  $('#plist').replaceChildren(h('div', {class:'skeleton'}), h('div', {class:'skeleton'}), h('div', {class:'skeleton'}));
+  return Promise.all([
+    sb.from('products').select('*').order('sort_order').order('created_at'),
+    sb.from('faqs').select('*').order('sort_order').order('created_at'),
+    sb.from('site_content').select('*').eq('id', 1).maybeSingle()
+  ]).then(function(r){
+    var bad = r.filter(function(x){ return x.error; })[0];
+    if(bad){ banner('#load-err', 'Could not load data: ' + friendly(bad.error), true); $('#load-err').append(' ', h('button', {class:'btn btn-ghost btn-sm', type:'button', onclick:loadAll}, 'Retry')); $('#plist').replaceChildren(); return; }
+    state.products = r[0].data || []; state.faqs = r[1].data || [];
+    state.content = r[2].data;
+    if(!state.content) banner('#load-err', 'No site content row found. Re-run supabase/schema.sql to create it.', true);
+    fillSelects(); route();
+  }).catch(function(e){ banner('#load-err', 'Could not load data: ' + friendly(e), true); });
+}
+var loc = function(){ return (state.content && state.content.locale) || 'en-IN'; };
+var defCur = function(){ return (state.content && state.content.default_currency) || 'INR'; };
+
+function fillSelects(){
+  var opts = function(sel, list, val){ sel.replaceChildren.apply(sel, list.map(function(x){ var o = h('option', {value:Array.isArray(x) ? x[0] : x}, Array.isArray(x) ? x[1] : x); return o; })); if(val) sel.value = val; };
+  opts($('#pf-cur'), CURRENCIES, defCur()); opts($('#s-cur'), CURRENCIES, defCur()); opts($('#s-loc'), LOCALES, loc());
+}
+
+/* ---------- routing / shell ---------- */
+var TITLES = {dashboard:'Dashboard', product:'Product', content:'Website content', faqs:'FAQs', settings:'Settings'};
+function route(){
+  if(!state.user) return;
+  var parts = (location.hash.slice(1) || 'dashboard').split('/'), view = parts[0];
+  if(!TITLES[view]) view = 'dashboard';
+  ['dashboard','product','content','faqs','settings'].forEach(function(v){ $('#v-' + v).hidden = v !== view; });
+  [].forEach.call(document.querySelectorAll('[data-nav]'), function(b){ if(b.dataset.nav === (view === 'product' ? 'dashboard' : view)) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  closeMenu();
+  if(view === 'dashboard') renderDashboard();
+  if(view === 'product'){ if(!openEditor(parts[1])){ location.hash = '#dashboard'; return; } }
+  if(view === 'content') fillContent();
+  if(view === 'faqs') renderFaqs();
+  if(view === 'settings') fillSettings();
+  document.title = TITLES[view] + ' · TryTap Admin';
+  var hd = $('#v-' + view + ' h1'); if(hd && !route.first){ hd.focus({preventScroll:true}); } route.first = false; window.scrollTo(0, 0);
+}
+route.first = true;
+window.addEventListener('hashchange', route);
+[].forEach.call(document.querySelectorAll('[data-nav]'), function(b){ b.addEventListener('click', function(){ if(location.hash === '#' + b.dataset.nav) route(); else location.hash = '#' + b.dataset.nav; }); });
+function openMenu(){ $('#side').classList.add('open'); $('#scrim').classList.add('show'); $('#burger').setAttribute('aria-expanded','true'); }
+function closeMenu(){ $('#side').classList.remove('open'); $('#scrim').classList.remove('show'); $('#burger').setAttribute('aria-expanded','false'); }
+$('#burger').addEventListener('click', function(){ $('#side').classList.contains('open') ? closeMenu() : openMenu(); });
+$('#scrim').addEventListener('click', closeMenu);
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMenu(); });
+
+/* ---------- dashboard ---------- */
+function renderDashboard(){
+  var pub = state.products.filter(function(p){ return p.published; }).length;
+  $('#s-total').textContent = state.products.length; $('#s-pub').textContent = pub; $('#s-draft').textContent = state.products.length - pub;
+  var q = $('#search').value.trim().toLowerCase(), f = $('#filter').value;
+  var rows = state.products.filter(function(p){
+    if(f === 'published' && !p.published) return false; if(f === 'draft' && p.published) return false;
+    return !q || (p.name + ' ' + p.slug + ' ' + p.category).toLowerCase().indexOf(q) > -1;
+  });
+  var list = $('#plist'); list.replaceChildren();
+  if(!state.products.length){ list.append(h('div', {class:'empty'}, h('p', null, 'No products yet.'), h('button', {class:'btn btn-lime', type:'button', onclick:function(){ location.hash = '#product/new'; }}, '+ Add your first product'))); return; }
+  if(!rows.length){ list.append(h('div', {class:'empty'}, 'No products match your search.')); return; }
+  list.append(h('div', {class:'prow head', 'aria-hidden':'true'}, h('span', null, 'Product'), h('span', null, 'Category'), h('span', null, 'Price'), h('span', null, 'Status'), h('span')));
+  rows.forEach(function(p){
+    var thumb = p.image_url ? h('img', {class:'thumb', src:p.image_url, alt:'', loading:'lazy'}) : h('span', {class:'thumb', 'aria-hidden':'true'}, 'T');
+    var btns = [
+      h('button', {class:'btn btn-ghost btn-sm', type:'button', onclick:function(){ location.hash = '#product/' + p.id; }}, 'Edit'),
+      h('button', {class:'btn btn-ghost btn-sm', type:'button', 'data-loading':'Copying…', onclick:function(e){ duplicate(p, e.currentTarget); }}, 'Duplicate'),
+      h('button', {class:'btn btn-ghost btn-sm', type:'button', 'data-loading':'Updating…', onclick:function(e){ togglePublish(p, e.currentTarget); }}, p.published ? 'Unpublish' : 'Publish'),
+      h('button', {class:'btn btn-danger btn-sm', type:'button', 'aria-label':'Delete ' + p.name, onclick:function(){ removeProduct(p); }}, 'Delete')
+    ];
+    list.append(h('div', {class:'prow'},
+      h('div', {class:'pname c-name'}, thumb, h('div', {style:'min-width:0'}, h('b', null, p.name), h('small', null, '/' + p.slug))),
+      h('span', {class:'c-cat'}, p.category || '–'),
+      h('span', {class:'price-cell c-price'}, p.compare_at_minor ? h('s', null, fmt(p.compare_at_minor, p.currency, loc())) : null, fmt(p.price_minor, p.currency, loc())),
+      h('span', {class:'c-status'}, h('span', {class:'tag ' + (p.published ? 'pub' : 'draft')}, p.published ? 'Published' : 'Draft'), p.is_featured ? h('span', {class:'tag star'}, 'Popular') : null),
+      h('div', {class:'pact'}, btns)));
+  });
+}
+$('#search').addEventListener('input', renderDashboard); $('#filter').addEventListener('change', renderDashboard);
+$('#add-product').addEventListener('click', function(){ location.hash = '#product/new'; });
+
+function replaceLocal(row){ var i = state.products.findIndex(function(p){ return p.id === row.id; }); if(i > -1) state.products[i] = row; else state.products.push(row); state.products.sort(function(a, b){ return a.sort_order - b.sort_order || String(a.created_at).localeCompare(String(b.created_at)); }); }
+function nextSort(arr){ return arr.reduce(function(m, x){ return Math.max(m, x.sort_order || 0); }, 0) + 1; }
+
+function togglePublish(p, btn){
+  return busy(btn, function(){
+    return sb.from('products').update({published: !p.published}).eq('id', p.id).select().then(function(r){
+      if(r.error) return toast(friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return toast('Not changed: the server did not accept the update (permission denied?).', true);
+      replaceLocal(r.data[0]); renderDashboard(); toast('“' + p.name + '” is now ' + (r.data[0].published ? 'published.' : 'a draft.'));
+    });
+  });
+}
+function duplicate(p, btn){
+  return busy(btn, function(){
+    var base = (p.slug + '-copy').slice(0, 76), slug = base, n = 2;
+    while(state.products.some(function(x){ return x.slug === slug; })) slug = base + '-' + n++;
+    var copy = {name:(p.name + ' (copy)').slice(0, 80), slug:slug, description:p.description, price_minor:p.price_minor, compare_at_minor:p.compare_at_minor, currency:p.currency, image_url:p.image_url, category:p.category, features:p.features, availability:p.availability, is_featured:false, published:false, sort_order:nextSort(state.products)};
+    return sb.from('products').insert(copy).select().then(function(r){
+      if(r.error) return toast(friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return toast('Not duplicated: the server did not accept the insert.', true);
+      replaceLocal(r.data[0]); toast('Duplicated as a draft. You can edit it now.'); location.hash = '#product/' + r.data[0].id;
+    });
+  });
+}
+function ourFile(url){ var m = url && url.split('/product-images/')[1]; return m ? decodeURIComponent(m.split('?')[0]) : null; }
+function dropImageIfUnused(url, exceptId){
+  var f = ourFile(url); if(!f) return Promise.resolve();
+  if(state.products.some(function(p){ return p.id !== exceptId && p.image_url === url; })) return Promise.resolve();
+  return sb.storage.from('product-images').remove([f]).then(function(){}, function(){});
+}
+function removeProduct(p){
+  confirmBox('Delete “' + p.name + '”?', 'This permanently deletes the product from your website and database. This cannot be undone.', 'Delete product').then(function(ok){
+    if(!ok) return;
+    sb.from('products').delete().eq('id', p.id).select('id').then(function(r){
+      if(r.error) return toast(friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return toast('Not deleted: the server did not accept the request (permission denied or already removed).', true);
+      state.products = state.products.filter(function(x){ return x.id !== p.id; });
+      dropImageIfUnused(p.image_url, p.id);
+      toast('Product deleted.'); if(location.hash.indexOf('#product') === 0) location.hash = '#dashboard'; else renderDashboard();
+    });
+  });
+}
+
+/* ---------- product editor ---------- */
+var slugTouched = false;
+function openEditor(id){
+  var p = null;
+  if(id && id !== 'new'){ p = state.products.filter(function(x){ return x.id === id; })[0]; if(!p){ toast('That product no longer exists.', true); return false; } }
+  clearErrs($('#pform')); banner('#p-banner', ''); $('#p-when').textContent = ''; $('#img-e').textContent = '';
+  state.editing = {id:p ? p.id : null, image_url:p ? p.image_url : null, original_image:p ? p.image_url : null};
+  $('#h-prod').textContent = p ? 'Edit product' : 'Add product';
+  $('#pf-name').value = p ? p.name : ''; $('#pf-slug').value = p ? p.slug : ''; slugTouched = !!p;
+  $('#pf-desc').value = p ? p.description : ''; $('#pf-desc-n').textContent = $('#pf-desc').value.length;
+  $('#pf-cat').value = p ? p.category : ''; $('#pf-avail').value = p ? p.availability : 'in_stock';
+  $('#pf-feat').value = p ? (p.features || []).join('\n') : '';
+  if(p && !Array.prototype.some.call($('#pf-cur').options, function(o){ return o.value === p.currency; })) $('#pf-cur').append(h('option', {value:p.currency}, p.currency));
+  $('#pf-cur').value = p ? p.currency : defCur();
+  $('#pf-price').value = p ? fromMinor(p.price_minor, p.currency) : ''; $('#pf-cmp').value = p && p.compare_at_minor ? fromMinor(p.compare_at_minor, p.currency) : '';
+  $('#pf-pub').checked = p ? p.published : false; $('#pf-feat-b').checked = p ? p.is_featured : false;
+  $('#cat-list').replaceChildren.apply($('#cat-list'), Array.from(new Set(state.products.map(function(x){ return x.category; }).filter(Boolean))).map(function(c){ return h('option', {value:c}); }));
+  showImage(); pricePreview();
+  var a = $('#prod-actions'); a.replaceChildren();
+  if(p){
+    a.append(h('button', {class:'btn btn-ghost', type:'button', 'data-loading':'Copying…', onclick:function(e){ duplicate(p, e.currentTarget); }}, 'Duplicate'),
+      h('button', {class:'btn btn-danger', type:'button', onclick:function(){ removeProduct(p); }}, 'Delete'));
+  }
+  return true;
+}
+function showImage(){
+  var u = state.editing.image_url, box = $('#img-prev');
+  box.replaceChildren(u ? h('img', {src:u, alt:'Product image preview'}) : h('span', null, 'No image', h('br'), '(default card art is used)'));
+  $('#img-rm').hidden = !u; $('#img-pick').textContent = u ? 'Replace image' : 'Upload image';
+}
+function pricePreview(){
+  var cur = $('#pf-cur').value, m = toMinor($('#pf-price').value, cur), t = $('#pf-price-h');
+  t.textContent = m == null ? 'Enter the amount in ' + cur + ', e.g. 1999 or 1999.50.' : 'Displays as ' + fmt(m, cur, loc());
+}
+$('#pf-name').addEventListener('input', function(){ if(!slugTouched) $('#pf-slug').value = slugify($('#pf-name').value); });
+$('#pf-slug').addEventListener('input', function(){ slugTouched = true; });
+$('#pf-desc').addEventListener('input', function(){ $('#pf-desc-n').textContent = $('#pf-desc').value.length; });
+$('#pf-price').addEventListener('input', pricePreview); $('#pf-cur').addEventListener('change', pricePreview);
+$('#img-pick').addEventListener('click', function(){ $('#pf-file').click(); });
+$('#img-rm').addEventListener('click', function(){ state.editing.image_url = null; showImage(); });
+$('#pf-file').addEventListener('change', function(){
+  var f = this.files[0], err = $('#img-e'); this.value = ''; err.textContent = ''; if(!f) return;
+  var ext = {'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/avif':'avif'}[f.type];
+  if(!ext){ err.textContent = 'Unsupported file type. Use JPG, PNG, WebP or AVIF.'; return; }
+  if(f.size > 2 * 1024 * 1024){ err.textContent = 'Image is larger than 2 MB. Please compress it first.'; return; }
+  var pick = $('#img-pick'); pick.disabled = true; pick.classList.add('loading'); err.textContent = 'Uploading…';
+  var path = (window.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2)) + '.' + ext;
+  sb.storage.from('product-images').upload(path, f, {contentType:f.type, cacheControl:'31536000', upsert:false}).then(function(r){
+    if(r.error){ err.textContent = 'Upload failed: ' + friendly(r.error); return; }
+    state.editing.image_url = sb.storage.from('product-images').getPublicUrl(path).data.publicUrl; err.textContent = ''; showImage();
+    toast('Image uploaded. Click “Save product” to apply it.');
+  }).catch(function(e){ err.textContent = 'Upload failed: ' + friendly(e); }).finally(function(){ pick.disabled = false; pick.classList.remove('loading'); });
+});
+
+function readProduct(){
+  var E = {}, cur = $('#pf-cur').value;
+  var name = $('#pf-name').value.trim(), slug = $('#pf-slug').value.trim(), desc = $('#pf-desc').value.trim(), cat = $('#pf-cat').value.trim();
+  if(name.length < 2 || name.length > 80) E['pf-name'] = 'Enter a name between 2 and 80 characters.';
+  if(!slug) E['pf-slug'] = 'Enter a slug.'; else if(!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) E['pf-slug'] = 'Use lowercase letters, numbers and single hyphens only (e.g. trytap-pro).';
+  else if(state.products.some(function(p){ return p.slug === slug && p.id !== state.editing.id; })) E['pf-slug'] = 'Another product already uses this slug.';
+  if(desc.length > 600) E['pf-desc'] = 'Description must be 600 characters or fewer.';
+  if(cat.length > 40) E['pf-cat'] = 'Category must be 40 characters or fewer.';
+  var price = toMinor($('#pf-price').value, cur), cmpRaw = $('#pf-cmp').value.trim(), cmp = null;
+  if(price == null) E['pf-price'] = $('#pf-price').value.trim() ? 'Enter a valid amount with up to ' + digitsFor(cur) + ' decimals, e.g. 1999.' : 'Enter a price.';
+  if(cmpRaw){ cmp = toMinor(cmpRaw, cur); if(cmp == null) E['pf-cmp'] = 'Enter a valid amount or leave empty.'; else if(price != null && cmp <= price) E['pf-cmp'] = 'Compare-at price must be higher than the price.'; }
+  var feats = $('#pf-feat').value.split('\n').map(function(x){ return x.trim(); }).filter(Boolean);
+  if(feats.length > 8) E['pf-feat'] = 'Use 8 features or fewer.'; else if(feats.some(function(x){ return x.length > 80; })) E['pf-feat'] = 'Each feature must be 80 characters or fewer.';
+  return {errors:E, payload:{name:name, slug:slug, description:desc, category:cat, price_minor:price, compare_at_minor:cmp, currency:cur, features:feats, availability:$('#pf-avail').value, is_featured:$('#pf-feat-b').checked, published:$('#pf-pub').checked, image_url:state.editing.image_url}};
+}
+$('#pform').addEventListener('submit', function(e){
+  e.preventDefault(); clearErrs(this); banner('#p-banner', '');
+  var r = readProduct(), keys = Object.keys(r.errors);
+  if(keys.length){ keys.forEach(function(k){ setErr(k.replace(/-e$/, ''), r.errors[k]); }); banner('#p-banner', 'Please fix the ' + keys.length + ' highlighted field' + (keys.length > 1 ? 's' : '') + ' before saving.', true); $('#' + keys[0]).focus(); return; }
+  var ed = state.editing;
+  busy($('#p-save'), function(){
+    var q = ed.id ? sb.from('products').update(r.payload).eq('id', ed.id).select() : sb.from('products').insert(Object.assign({sort_order:nextSort(state.products)}, r.payload)).select();
+    return q.then(function(res){
+      if(res.error){
+        if(res.error.code === '23505') { setErr('pf-slug', friendly(res.error)); $('#pf-slug').focus(); }
+        banner('#p-banner', 'Not saved. ' + friendly(res.error), true); return;
+      }
+      if(!res.data || res.data.length !== 1){ banner('#p-banner', 'Not saved: the server did not accept the change (permission denied?). Nothing was modified.', true); return; }
+      var row = res.data[0]; replaceLocal(row);
+      if(ed.original_image && ed.original_image !== row.image_url) dropImageIfUnused(ed.original_image, row.id);
+      state.editing = {id:row.id, image_url:row.image_url, original_image:row.image_url};
+      banner('#p-banner', 'Saved. The change is live on the website after a refresh' + (row.published ? '.' : ' once you publish it (currently a draft).'));
+      $('#p-when').textContent = nowStr(); toast('Product saved.');
+      if(!ed.id){ history.replaceState(null, '', '#product/' + row.id); openEditor(row.id); banner('#p-banner', 'Saved. The change is live on the website after a refresh' + (row.published ? '.' : ' once you publish it (currently a draft).')); $('#p-when').textContent = nowStr(); }
+    });
+  });
+});
+
+/* ---------- website content ---------- */
+var CFIELDS = ['hero_heading','hero_heading_accent','hero_subtext','tagline','hero_cta_primary','hero_cta_secondary','nav_cta','products_lead','about_text','contact_email','contact_phone','contact_address'];
+function fillContent(){ clearErrs($('#cform')); banner('#c-banner', ''); $('#c-when').textContent = ''; CFIELDS.forEach(function(k){ $('#c-' + k).value = state.content ? (state.content[k] || '') : ''; }); }
+$('#cform').addEventListener('submit', function(e){
+  e.preventDefault(); clearErrs(this); banner('#c-banner', '');
+  var v = {}, E = {}; CFIELDS.forEach(function(k){ v[k] = $('#c-' + k).value.trim(); });
+  [['hero_heading',80],['hero_heading_accent',80],['hero_cta_primary',40],['hero_cta_secondary',40],['nav_cta',30]].forEach(function(x){ if(!v[x[0]]) E['c-' + x[0]] = 'This field is required.'; else if(v[x[0]].length > x[1]) E['c-' + x[0]] = 'Maximum ' + x[1] + ' characters.'; });
+  if(v.contact_email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.contact_email)) E['c-contact_email'] = 'Enter a valid email address.';
+  if(v.contact_phone && !/^\+?[\d\s().-]{6,}$/.test(v.contact_phone)) E['c-contact_phone'] = 'Enter a valid phone number, e.g. +91 98765 43210.';
+  var keys = Object.keys(E);
+  if(keys.length){ keys.forEach(function(k){ setErr(k, E[k]); }); banner('#c-banner', 'Please fix the highlighted fields.', true); $('#' + keys[0]).focus(); return; }
+  busy($('#c-save'), function(){
+    return sb.from('site_content').update(v).eq('id', 1).select().then(function(r){
+      if(r.error) return banner('#c-banner', 'Not saved. ' + friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return banner('#c-banner', 'Not saved: the server did not accept the change (permission denied, or the content row is missing).', true);
+      state.content = r.data[0]; banner('#c-banner', 'Saved. Refresh the public website to see the new content.'); $('#c-when').textContent = nowStr(); toast('Website content saved.');
+    });
+  });
+});
+
+/* ---------- settings ---------- */
+function fillSettings(){ banner('#s-banner', ''); $('#s-when').textContent = ''; $('#s-cur').value = defCur(); $('#s-loc').value = loc(); settingsPreview(); }
+function settingsPreview(){ $('#s-prev').textContent = fmt(199900, $('#s-cur').value, $('#s-loc').value) + '  ·  ' + fmt(250050, $('#s-cur').value, $('#s-loc').value); }
+$('#s-cur').addEventListener('change', settingsPreview); $('#s-loc').addEventListener('change', settingsPreview);
+$('#sform').addEventListener('submit', function(e){
+  e.preventDefault(); banner('#s-banner', '');
+  busy($('#s-save'), function(){
+    return sb.from('site_content').update({default_currency:$('#s-cur').value, locale:$('#s-loc').value}).eq('id', 1).select().then(function(r){
+      if(r.error) return banner('#s-banner', 'Not saved. ' + friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return banner('#s-banner', 'Not saved: the server did not accept the change.', true);
+      state.content = r.data[0]; banner('#s-banner', 'Saved. Prices on the website use the new number format after a refresh.'); $('#s-when').textContent = nowStr(); toast('Settings saved.');
+    });
+  });
+});
+
+/* ---------- FAQs ---------- */
+function renderFaqs(){
+  var list = $('#faq-list'); list.replaceChildren();
+  if(!state.faqs.length){ list.append(h('div', {class:'empty'}, 'No FAQs yet. The website will keep its built-in FAQs until you add one.')); return; }
+  state.faqs.forEach(function(f, i){
+    list.append(h('div', {class:'faqrow'},
+      h('div', null, h('b', null, f.question, ' ', h('span', {class:'tag ' + (f.published ? 'pub' : 'draft')}, f.published ? 'Published' : 'Hidden')), h('p', null, f.answer)),
+      h('div', {class:'pact'},
+        h('button', {class:'btn btn-ghost btn-sm', type:'button', 'aria-label':'Move up: ' + f.question, disabled:i === 0, onclick:function(){ moveFaq(i, -1); }}, '↑'),
+        h('button', {class:'btn btn-ghost btn-sm', type:'button', 'aria-label':'Move down: ' + f.question, disabled:i === state.faqs.length - 1, onclick:function(){ moveFaq(i, 1); }}, '↓'),
+        h('button', {class:'btn btn-ghost btn-sm', type:'button', onclick:function(){ openFaq(f); }}, 'Edit'),
+        h('button', {class:'btn btn-danger btn-sm', type:'button', 'aria-label':'Delete FAQ: ' + f.question, onclick:function(){ deleteFaq(f); }}, 'Delete'))));
+  });
+}
+function moveFaq(i, d){
+  var arr = state.faqs.slice(), j = i + d; if(j < 0 || j >= arr.length) return;
+  var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  var rows = arr.map(function(f, k){ return Object.assign({}, f, {sort_order:k + 1}); });
+  sb.from('faqs').upsert(rows).select().then(function(r){
+    if(r.error) return toast(friendly(r.error), true);
+    if(!r.data || r.data.length !== rows.length) return toast('Order not saved: the server did not accept the change.', true);
+    state.faqs = r.data.sort(function(a, b){ return a.sort_order - b.sort_order; }); renderFaqs(); toast('FAQ order saved.');
+  });
+}
+function openFaq(f){
+  state.faqEditing = f || null; clearErrs($('#fform')); banner('#f-banner', '');
+  $('#fd-t').textContent = f ? 'Edit FAQ' : 'Add FAQ'; $('#f-q').value = f ? f.question : ''; $('#f-a').value = f ? f.answer : ''; $('#f-pub').checked = f ? f.published : true;
+  $('#faq-dlg').showModal(); $('#f-q').focus();
+}
+$('#add-faq').addEventListener('click', function(){ openFaq(null); });
+$('#f-cancel').addEventListener('click', function(){ $('#faq-dlg').close(); });
+$('#fform').addEventListener('submit', function(e){
+  e.preventDefault(); clearErrs(this); banner('#f-banner', '');
+  var q = $('#f-q').value.trim(), a = $('#f-a').value.trim(), bad = false;
+  if(q.length < 3 || q.length > 200){ setErr('f-q', 'Enter a question between 3 and 200 characters.'); bad = true; }
+  if(a.length < 3 || a.length > 1500){ setErr('f-a', 'Enter an answer between 3 and 1500 characters.'); bad = true; }
+  if(bad){ ($('#f-q[aria-invalid]') || $('#f-a')).focus(); return; }
+  var ed = state.faqEditing, payload = {question:q, answer:a, published:$('#f-pub').checked};
+  busy($('#f-save'), function(){
+    var req = ed ? sb.from('faqs').update(payload).eq('id', ed.id).select() : sb.from('faqs').insert(Object.assign({sort_order:nextSort(state.faqs)}, payload)).select();
+    return req.then(function(r){
+      if(r.error) return banner('#f-banner', 'Not saved. ' + friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return banner('#f-banner', 'Not saved: the server did not accept the change.', true);
+      var row = r.data[0], i = state.faqs.findIndex(function(x){ return x.id === row.id; }); if(i > -1) state.faqs[i] = row; else state.faqs.push(row);
+      $('#faq-dlg').close(); renderFaqs(); toast('FAQ saved.');
+    });
+  });
+});
+function deleteFaq(f){
+  confirmBox('Delete this FAQ?', '“' + f.question + '” will be permanently removed from your website.', 'Delete FAQ').then(function(ok){
+    if(!ok) return;
+    sb.from('faqs').delete().eq('id', f.id).select('id').then(function(r){
+      if(r.error) return toast(friendly(r.error), true);
+      if(!r.data || r.data.length !== 1) return toast('Not deleted: the server did not accept the request.', true);
+      state.faqs = state.faqs.filter(function(x){ return x.id !== f.id; }); renderFaqs(); toast('FAQ deleted.');
+    });
+  });
+}
+})();
+</script>
+</body>
+</html>
